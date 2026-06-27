@@ -13,17 +13,37 @@ on:
 jobs:
   consumer:
     runs-on: ubuntu-latest
+
     steps:
       - name: 00. Checkout Code
         uses: actions/checkout@v5
 
-      - name: Set up Java
+      - name: 01. Set up Java
         uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "22"
           cache: maven
 
-      - name: Build consumer
+      - name: 02. Install Pact CLI
+        run: |
+          curl -fsSL https://github.com/pact-foundation/pact-ruby-standalone/releases/download/v2.4.5/pact-2.4.5-linux-x86_64.tar.gz | tar xz -C $HOME
+          echo "$HOME/pact/bin" >> $GITHUB_PATH
+
+      - name: 03. Start Pact Broker
+        run: |
+          docker compose -f posConsumerProj/src/test/resources/docker-compose.pact-broker.yml down -v
+          docker compose -f posConsumerProj/src/test/resources/docker-compose.pact-broker.yml up -d --wait
+
+      - name: 04. Run Consumer Tests
         working-directory: posConsumerProj
-        run: mvn test
+        run: |
+          mvn -Dtest=PosOmsConsumerPactTest test
+
+      - name: 05. Publish Contracts to Broker
+        working-directory: posConsumerProj
+        run: |
+          pact-broker publish target/pacts \
+            --consumer-app-version=${{ github.sha }} \
+            --branch=main \
+            --broker-base-url=http://127.0.0.1:9292

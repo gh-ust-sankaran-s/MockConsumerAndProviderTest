@@ -15,19 +15,55 @@ on:
 jobs:
   provider:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout
+      - name: 00. Checkout Code
         uses: actions/checkout@v5
 
-      - name: Set up Java
+      - name: 01. Set up Java
         uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "22"
           cache: maven
 
-      - name: Generate common pact from consumer
-        run: mvn -pl posConsumerProj test
+      - name: 02. Install Pact CLI
+        run: |
+          curl -fsSL https://github.com/pact-foundation/pact-ruby-standalone/releases/download/v2.4.5/pact-2.4.5-linux-x86_64.tar.gz | tar xz -C $HOME
+          echo "$HOME/pact/bin" >> $GITHUB_PATH
 
-      - name: Verify provider against common pact
-        run: mvn -pl omsProviderProj test
+      - name: 03. Start Pact Broker
+        run: |
+          docker compose -f omsProviderProj/src/test/resources/docker-compose.pact-broker.yml down -v
+          docker compose -f omsProviderProj/src/test/resources/docker-compose.pact-broker.yml up -d --wait
+
+      - name: 04. Generate Consumer Pact
+        run: |
+          mvn -pl posConsumerProj -Dtest=PosOmsConsumerPactTest test
+
+      - name: 05. Run Provider Verification
+        run: |
+          mvn -pl omsProviderProj \
+              -Dtest=OmsProviderVerificationTest \
+              -Dgit.sha=${{ github.sha }} \
+              -Dpactbroker.host=127.0.0.1 \
+              -Dpactbroker.port=9292 \
+              test
+
+      - name: 06. Record Provider Deployment
+        run: |
+          pact-broker record-deployment \
+            --pacticipant oms-provider \
+            --version ${{ github.sha }} \
+            --environment production \
+            --broker-base-url http://127.0.0.1:9292
+
+      - name: 07. Can I Deploy
+        env:
+          CONTRACT_VERSION: ${{ github.sha }}
+        run: |
+          pact-broker can-i-deploy \
+            --pacticipant pos-consumer \
+            --version $CONTRACT_VERSION \
+            --to-environment production \
+            --broker-base-url http://127.0.0.1:9292
