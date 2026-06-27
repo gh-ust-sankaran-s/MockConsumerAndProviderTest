@@ -39,16 +39,16 @@ jobs:
 
       - name: 04. Generate Consumer Pact
         run: |
-          mvn -pl posConsumerProj -Dtest=OmsProviderVerificationTest test
+          mvn -pl omsProviderProj -Dtest=OmsProviderVerificationTest test
 
       - name: 05. Run Provider Verification
         run: |
           mvn -pl omsProviderProj \
-              -Dtest=OmsProviderVerificationTest \
-              -Dgit.sha=${{ github.sha }} \
-              -Dpactbroker.host=127.0.0.1 \
-              -Dpactbroker.port=9292 \
-              test
+            -Dtest=OmsProviderVerificationTest \
+            -Dgit.sha=${{ github.sha }} \
+            -Dpactbroker.host=127.0.0.1 \
+            -Dpactbroker.port=9292 \
+            test
 
       - name: 06. Record Provider Deployment
         run: |
