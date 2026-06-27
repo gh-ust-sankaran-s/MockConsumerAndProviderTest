@@ -120,6 +120,7 @@
                 <configuration>
                     <systemPropertyVariables>
                         <pact_do_not_track>true</pact_do_not_track>
+                        <pact.rootDir>${maven.multiModuleProjectDirectory}/target/pacts</pact.rootDir>
                         <pact.verifier.publishResults>${pact.verifier.publishResults}</pact.verifier.publishResults>
                         <pact.provider.version>${git.sha}</pact.provider.version>
                         <pact.provider.branch>${pact.provider.branch}</pact.provider.branch>
@@ -133,7 +134,7 @@
                 <version>${pact.version}</version>
 
                 <configuration>
-                    <pactDirectory>${project.build.directory}/pacts</pactDirectory>
+                    <pactDirectory>${maven.multiModuleProjectDirectory}/target/pacts</pactDirectory>
                     <pactBrokerUrl>${pact.broker.url}</pactBrokerUrl>
                     <projectVersion>${pact.publish.consumer.version}</projectVersion>
                     <branchName>${pact.publish.consumer.branchName}</branchName>
@@ -147,3 +148,5 @@
         </plugins>
     </build>
 </project>
+
+

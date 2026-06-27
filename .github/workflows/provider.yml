@@ -3,10 +3,12 @@ name: Provider CI
 on:
   push:
     paths:
+      - "posConsumerProj/**"
       - "omsProviderProj/**"
       - ".github/workflows/provider.yml"
   pull_request:
     paths:
+      - "posConsumerProj/**"
       - "omsProviderProj/**"
       - ".github/workflows/provider.yml"
 
@@ -24,6 +26,8 @@ jobs:
           java-version: "22"
           cache: maven
 
-      - name: Build provider
-        working-directory: omsProviderProj
-        run: mvn test
+      - name: Generate common pact from consumer
+        run: mvn -pl posConsumerProj test
+
+      - name: Verify provider against common pact
+        run: mvn -pl omsProviderProj test

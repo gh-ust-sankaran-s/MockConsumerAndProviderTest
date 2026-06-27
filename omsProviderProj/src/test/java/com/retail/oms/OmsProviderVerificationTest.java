@@ -20,10 +20,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
 @Provider("oms-provider")
+//@PactFolder("../target/pacts")
 @PactBroker(
         url = "http://127.0.0.1:9292"
 )
-//@PactFolder("target/pacts")
 public class OmsProviderVerificationTest {
 
     @RegisterExtension
