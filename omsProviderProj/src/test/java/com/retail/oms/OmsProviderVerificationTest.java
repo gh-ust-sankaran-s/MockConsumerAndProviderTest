@@ -1,5 +1,6 @@
 package com.retail.oms;
 
+
 import au.com.dius.pact.provider.junit5.HttpTestTarget;
 import au.com.dius.pact.provider.junit5.PactVerificationContext;
 import au.com.dius.pact.provider.junit5.PactVerificationInvocationContextProvider;
@@ -18,11 +19,11 @@ import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.extension.RegisterExtension;
 
-
+@Provider("oms-provider")
 @PactBroker(
         url = "http://127.0.0.1:9292"
 )
-@PactFolder("target/pacts")
+//@PactFolder("target/pacts")
 public class OmsProviderVerificationTest {
 
     @RegisterExtension
