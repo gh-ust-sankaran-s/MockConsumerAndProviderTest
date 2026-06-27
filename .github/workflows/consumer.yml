@@ -1,0 +1,29 @@
+name: Consumer CI
+
+on:
+  push:
+    paths:
+      - "posConsumerProj/**"
+      - ".github/workflows/consumer.yml"
+  pull_request:
+    paths:
+      - "posConsumerProj/**"
+      - ".github/workflows/consumer.yml"
+
+jobs:
+  consumer:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 00. Checkout Code
+        uses: actions/checkout@v5
+
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "22"
+          cache: maven
+
+      - name: Build consumer
+        working-directory: posConsumerProj
+        run: mvn test
