@@ -38,7 +38,7 @@ jobs:
       - name: 04. Run Consumer Tests
         working-directory: posConsumerProj
         run: |
-          mvn -Dtest=PosOmsConsumerPactTest test
+          mvn -Dtest=PosConsumerPactTest test
 
       - name: 05. Publish Contracts to Broker
         working-directory: posConsumerProj

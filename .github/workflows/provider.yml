@@ -39,7 +39,7 @@ jobs:
 
       - name: 04. Generate Consumer Pact
         run: |
-          mvn -pl posConsumerProj -Dtest=PosOmsConsumerPactTest test
+          mvn -pl posConsumerProj -Dtest=OmsProviderVerificationTest test
 
       - name: 05. Run Provider Verification
         run: |
@@ -53,7 +53,7 @@ jobs:
       - name: 06. Record Provider Deployment
         run: |
           pact-broker record-deployment \
-            --pacticipant oms-provider \
+            --pacticipant omsProviderProj \
             --version ${{ github.sha }} \
             --environment production \
             --broker-base-url http://127.0.0.1:9292
@@ -63,7 +63,7 @@ jobs:
           CONTRACT_VERSION: ${{ github.sha }}
         run: |
           pact-broker can-i-deploy \
-            --pacticipant pos-consumer \
+            --pacticipant posConsumerProj \
             --version $CONTRACT_VERSION \
             --to-environment production \
             --broker-base-url http://127.0.0.1:9292
